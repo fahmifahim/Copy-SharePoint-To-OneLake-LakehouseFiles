@@ -67,14 +67,54 @@ print("✅ siteId:", site_id)
 
 
 
-## 4) Grant site access (Sites.Selected) — grants App B; can also grant App A if needed
+## 4) Ensure Sites.Selected grant on the site
 # This cell:
 # 1) Checks existing app grants on the site
 # 2) Grants "write" to App B (TARGET_APP_ID) if missing
 # 3) (Optional) Grants "write" to App A (caller) if GRANT_CALLER_APP_TOO=True
 
-def ensure_app_write_grant(site_id: str, app_client_id: str, display_name: str):
-    """Grant 'write' role to the given application on the site if not already granted."""
+# 🔎 Helper: resolve app display name from Graph by appId (with safe fallback).
+# Requires Directory.Read.All or Application.Read.All to succeed; otherwise we use the provided default_name.
+APP_NAME_CACHE = {}
+
+def resolve_app_name(app_client_id: str, default_name: str) -> str:
+    if app_client_id in APP_NAME_CACHE:
+        return APP_NAME_CACHE[app_client_id]
+
+    try:
+        # Try Enterprise App (service principal)
+        sp_url = f"https://graph.microsoft.com/v1.0/servicePrincipals?$filter=appId eq '{app_client_id}'&$select=displayName,appId"
+        sp_res = requests.get(sp_url, headers=headers)
+        if sp_res.status_code == 200:
+            vals = sp_res.json().get("value", [])
+            if vals:
+                name = vals[0].get("displayName") or default_name
+                APP_NAME_CACHE[app_client_id] = name
+                return name
+        # Try App Registration (application)
+        app_url = f"https://graph.microsoft.com/v1.0/applications?$filter=appId eq '{app_client_id}'&$select=displayName,appId"
+        app_res = requests.get(app_url, headers=headers)
+        if app_res.status_code == 200:
+            vals = app_res.json().get("value", [])
+            if vals:
+                name = vals[0].get("displayName") or default_name
+                APP_NAME_CACHE[app_client_id] = name
+                return name
+    except Exception:
+        pass  # fall back
+
+    APP_NAME_CACHE[app_client_id] = default_name
+    return default_name
+
+
+def ensure_app_write_grant(site_id: str, app_client_id: str, display_name_hint: str):
+    """
+    Ensure the given application (by Client ID) has 'write' on this site via Sites.Selected.
+    Prints both appId and a friendly app name (resolved via Graph when possible).
+    """
+    # Resolve a readable app name upfront (best effort)
+    resolved_name = resolve_app_name(app_client_id, display_name_hint)
+
     grant_url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/permissions"
     res = requests.get(grant_url, headers=headers)
     res.raise_for_status()
@@ -82,22 +122,27 @@ def ensure_app_write_grant(site_id: str, app_client_id: str, display_name: str):
     already = False
     for perm in res.json().get("value", []):
         for g in perm.get("grantedToIdentitiesV2", []):
-            if g.get("application", {}).get("id") == app_client_id:
-                print(f"ℹ️ App {app_client_id} already granted with roles: {perm.get('roles')}")
+            app_obj = g.get("application", {}) or {}
+            gid = app_obj.get("id")
+            gname = app_obj.get("displayName") or resolved_name
+            if gid == app_client_id:
+                print(f"ℹ️ App already granted: {gname} ({gid}) | roles: {perm.get('roles')}")
                 already = True
 
     if not already:
-        print(f"🛂 Granting 'write' to app {app_client_id} on this site …")
+        print(f"🛂 Granting 'write' to: {resolved_name} ({app_client_id}) on this site …")
         payload = {
             "roles": ["write"],
             "grantedToIdentities": [
-                {"application": {"id": app_client_id, "displayName": display_name}}
+                {"application": {"id": app_client_id, "displayName": resolved_name}}
             ]
         }
         create_res = requests.post(grant_url, headers=headers, json=payload)
         if create_res.status_code != 201:
-            raise RuntimeError(f"Grant failed for {app_client_id}: {create_res.status_code} {create_res.text}")
-        print("✅ Grant created.")
+            raise RuntimeError(f"Grant failed for {resolved_name} ({app_client_id}): "
+                               f"{create_res.status_code} {create_res.text}")
+        print(f"✅ Grant created for: {resolved_name} ({app_client_id}).")
+
 
 # 4a) Grant App B (target app) as requested
 ensure_app_write_grant(site_id, TARGET_APP_CLIENT_ID, TARGET_APP_DISPLAY)
