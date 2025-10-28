@@ -6,25 +6,25 @@
 
 ## 1) Parameters (edit here)
 # ── App A: the app that this notebook uses to call Microsoft Graph (client-credential flow)
-GRAPH_APP_CLIENT_ID   = "<App A - Client ID>"
-GRAPH_APP_CLIENT_SECRET = "<App A - Client Secret>"
-GRAPH_TENANT_ID       = "<Tenant (Directory) ID>"
+GRAPH_APP_CLIENT_ID       = "<App A - Client ID>"
+GRAPH_APP_CLIENT_SECRET   = "<App A - Client Secret>"
+GRAPH_TENANT_ID           = "<Tenant (Directory) ID>"
 
 # ── SharePoint tenant & site (from your URL)
-SP_TENANT_HOST        = "mngenvmcap535692.sharepoint.com"  # e.g., contoso.sharepoint.com
-SP_SITE_PATH          = "sharepoint-dzlab2"                # after /sites/
-SP_TARGET_FOLDER_PATH = "01.folder"                        # inside the default library (Documents). Use "A/B/C" for deeper paths.
+SP_TENANT_HOST            = "MySharePoint.sharepoint.com"
+SP_SITE_PATH              = "MySites123"       # after /sites/
+SP_TARGET_FOLDER_PATH     = "01_MyFolders"     # inside 'Documents' library; use "A/B/C" for deeper paths
 
 # ── App B: the SECOND app you want to GRANT on this site (Sites.Selected target)
-TARGET_APP_CLIENT_ID  = "<App B - Client ID>"
-TARGET_APP_DISPLAY    = "dzlab2-SharePoint-Access"           # label only (for readability in audit)
+TARGET_APP_CLIENT_ID      = "<App B - Client ID>"
+TARGET_APP_DISPLAY        = "MySite123-SharePoint-Access"
 
 # ── If App A also needs to read/move files now, grant it too (helps avoid 403)
-GRANT_CALLER_APP_TOO  = True
+GRANT_CALLER_APP_TOO      = True
 
 # ── Lakehouse Files destination
-LAKEHOUSE_FILES_ROOT  = "Files"              # Fabric Lakehouse "Files" area (don’t change)
-LAKEHOUSE_SITE_FOLDER = SP_SITE_PATH         # keep per-site subfolder organization
+LAKEHOUSE_FILES_ROOT      = "Files"              # Fabric Lakehouse "Files" area (don’t change)
+LAKEHOUSE_SITE_FOLDER     = SP_SITE_PATH         # keep per-site subfolder organization
 
 
 
