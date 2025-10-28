@@ -3,7 +3,8 @@
 This repository offers a Python-based solution to recursively copy the contents of a SharePoint folder—including all subfolders—into OneLake (Lakehouse Files). It uses MSAL for authentication and Microsoft Graph to access SharePoint data. While running, the notebook can also grant least-privilege per-site access (Sites.Selected) to another app, enabling future automations to safely access the same site.
 
 You may go through see the code here:  
-**sharepoint-to-onelake-recursive-copy.ipynb**
+[**sharepoint-to-onelake-recursive-copy.py**](https://github.com/fahmifahim/Copy-SharePoint-To-OneLake-LakehouseFiles/blob/main/notebook/sharepoint-to-onelake-recursive-copy.py)
+
 
 ## Why copy files from SharePoint Online to Fabric OneLake (Lakehouse Files)?
 Because analytics lives in OneLake. Teams drop PDFs, images, CSVs, and ad-hoc exports into SharePoint all the time—but your dashboards, notebooks, and pipelines run in Fabric. Pulling content from SharePoint → OneLake (/Files) lets you:
