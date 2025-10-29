@@ -147,7 +147,9 @@ For each file, the notebook prints a comment line showing the exact mapping:
 1. Open the notebook in Fabric and attach your Lakehouse.  
 2. Edit Cell 1 — Parameters with your values.  
 3. Run cells top to bottom.  
-4. Validate in Lakehouse → Files that paths/files appear as expected.  
+4. Validate in Lakehouse → Files that paths/files appear as expected.
+<img width="550" height="360" alt="RunResult" src="https://github.com/user-attachments/assets/a5190900-4b8d-4b0c-a500-0feac5f40601" />
+
 
 ### Option to automate the run:  
 **Operationalize:**  
