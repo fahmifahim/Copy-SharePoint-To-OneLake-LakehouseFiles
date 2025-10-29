@@ -47,11 +47,14 @@ App A (notebook) ── MSAL token ──> Microsoft Graph
 
 3. API permissions on App A and App B  
   - App A:  
-    - Add Microsoft Graph → Application permission Site.Full Controll.All.  Click Grant admin consent.  
+    - Add Microsoft Graph → Application permission Sites.FullControll.All . Click Grant admin consent.  
     - App A acts as the "admin account" who will authorize the next App Registration to access SharePoint.  
+    - <img width="500" height="300" alt="AppA-reg" src="https://github.com/user-attachments/assets/84806f8c-edc1-4f2e-9bc5-16958b0f24b1" />
 
   - App B:  
-    - Add SharePoint → Application permission Sites.Selected.  Click Grant admin consent.  
+    - Add SharePoint → Application permission Sites.Selected.  Click Grant admin consent.
+    - <img width="500" height="300" alt="AppB-reg" src="https://github.com/user-attachments/assets/bf78a7bf-a6ab-4f04-b815-9aed34f5e5a1" />
+
 
 [Microsoft Learn](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent)
 
