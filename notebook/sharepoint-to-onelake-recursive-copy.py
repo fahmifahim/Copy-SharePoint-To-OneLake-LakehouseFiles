@@ -245,7 +245,7 @@ for preview in all_files[:10]:
 
 
 ## 7) Copy each file to Lakehouse Files (preserve subfolder structure)
-# Use the base64 strategy mssparkutils.fs.put() writes text.
+# Use mssparkutils.fs.put() to write files into Lakehouse.
 # Each print includes a comment-style mapping line showing the exact SharePoint → Lakehouse paths.
 
 import os, base64
@@ -268,10 +268,17 @@ def ensure_parent_dirs(full_path: str):
     if parent and not mssparkutils.fs.exists(parent):
         mssparkutils.fs.mkdirs(parent)
 
-def put_base64(path_in_lakehouse: str, raw_bytes: bytes):
-    # Encode to base64 because fs.put writes text
-    b64_text = base64.b64encode(raw_bytes).decode("utf-8")
-    mssparkutils.fs.put(path_in_lakehouse, b64_text, overwrite=True)
+def write_bytes_to_lakehouse(dest_rel_path: str, raw_bytes: bytes):
+    # dest_rel_path: e.g., "Files/<site>/<folder>/image1.png"
+    # ensure parent dirs exist using mssparkutils (works with 'Files/' paths)
+    parent = "/".join(dest_rel_path.split("/")[:-1])
+    if parent and not mssparkutils.fs.exists(parent):
+        mssparkutils.fs.mkdirs(parent)
+
+    # Write raw bytes via the notebook's default Lakehouse mount
+    abs_path = f"/lakehouse/default/{dest_rel_path}"
+    with open(abs_path, "wb") as f:
+        f.write(raw_bytes)
 
 copied = 0
 for f in all_files:
@@ -288,13 +295,9 @@ for f in all_files:
         print(f"❌ Download failed: {sp_rel} (HTTP {dl.status_code})")
         continue
 
-    # Compute Lakehouse path mirroring the SharePoint structure
-    dest_path = lakehouse_dest_path(LAKEHOUSE_SITE_FOLDER, f["rel_path"], f["name"])
-    ensure_parent_dirs(dest_path)
-
-    # “Comment” line showing the exact mapping
-    print(f"# COPY: SP '{sp_rel}'  ->  Lakehouse '{dest_path}'")
-    put_base64(dest_path, dl.content)
+    dest_rel = lakehouse_dest_path(LAKEHOUSE_SITE_FOLDER, f["rel_path"], f["name"])  # returns "Files/..."
+    print(f"# COPY: SP '{sp_rel}' -> Lakehouse '{dest_rel}'")
+    write_bytes_to_lakehouse(dest_rel, dl.content)
 
     print(f"✅ Copied: {f['name']}")
     copied += 1
