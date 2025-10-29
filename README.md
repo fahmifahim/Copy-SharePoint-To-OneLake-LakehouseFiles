@@ -5,6 +5,7 @@ This repository offers a Python-based solution to recursively copy the contents 
 You may go through see the code here:  
 [**sharepoint-to-onelake-recursive-copy.py**](https://github.com/fahmifahim/Copy-SharePoint-To-OneLake-LakehouseFiles/blob/main/notebook/sharepoint-to-onelake-recursive-copy.py)
 
+<img width="1412" height="1030" alt="ArchitectureDiagram-SPOtoLakehouse" src="https://github.com/user-attachments/assets/797a03ab-fae2-4458-9f2a-f8674ddae397" />
 
 ## Why copy files from SharePoint Online to Fabric OneLake (Lakehouse Files)?
 Because analytics lives in OneLake. Teams drop PDFs, images, CSVs, and ad-hoc exports into SharePoint all the time—but your dashboards, notebooks, and pipelines run in Fabric. Pulling content from SharePoint → OneLake (/Files) lets you:
